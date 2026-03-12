@@ -9,6 +9,12 @@ class ImageAsset:
 
 
 @dataclass
+class SkuImageAsset(ImageAsset):
+    sku_id: str
+    sku_name: str
+
+
+@dataclass
 class PinRecord:
     title: str
     media_url: str

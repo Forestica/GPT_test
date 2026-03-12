@@ -13,6 +13,7 @@ class AppConfig:
     default_pin_description: str
     max_keywords_per_pin: int = 8
     max_description_chars: int = 500
+    mockup_selection_seed: int | None = None
 
 
 DEFAULT_CONFIG = AppConfig(
