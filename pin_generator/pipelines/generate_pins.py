@@ -5,13 +5,13 @@ from pathlib import Path
 from pin_generator.config import AppConfig
 from pin_generator.models import PinRecord
 from pin_generator.services.csv_exporter import save_pinterest_csv, save_upload_manifest
-from pin_generator.services.image_discovery import discover_images, make_public_media_url
+from pin_generator.services.image_discovery import discover_sku_mockups, make_public_media_url
 from pin_generator.services.keyword_selector import load_keyword_bank, select_keywords
 from pin_generator.services.text_generator import build_description, build_title, detect_etsy_link
 
 
 def generate_pins(config: AppConfig, etsy_mapping_file: Path | None = None) -> list[PinRecord]:
-    assets = discover_images(config.input_images_dir)
+    assets = discover_sku_mockups(config.input_images_dir, seed=config.mockup_selection_seed)
     keyword_bank = load_keyword_bank(config.keyword_bank_path)
 
     records: list[PinRecord] = []
