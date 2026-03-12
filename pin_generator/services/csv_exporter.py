@@ -52,6 +52,13 @@ def save_pinterest_csv_batches(
     output_dir.mkdir(parents=True, exist_ok=True)
     generated_files: list[Path] = []
 
+    if not records:
+        output_path = output_dir / f"{prefix}_batch_001.csv"
+        with output_path.open("w", newline="", encoding="utf-8") as fh:
+            writer = csv.DictWriter(fh, fieldnames=PINTEREST_HEADERS)
+            writer.writeheader()
+        return [output_path]
+
     for batch_index, start in enumerate(range(0, len(records), batch_size), start=1):
         output_path = output_dir / f"{prefix}_batch_{batch_index:03}.csv"
         batch_records = records[start : start + batch_size]

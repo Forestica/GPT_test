@@ -2,13 +2,16 @@ from pathlib import Path
 
 from pin_generator.models import ImageAsset
 
-SUPPORTED_EXTENSIONS = {".png", ".jpg", ".jpeg"}
+SUPPORTED_EXTENSIONS = {".png", ".jpg", ".jpeg", ".webp"}
 
 
 def discover_images(images_dir: Path) -> list[ImageAsset]:
     assets: list[ImageAsset] = []
-    for path in sorted(images_dir.glob("*")):
-        if path.suffix.lower() in SUPPORTED_EXTENSIONS and path.is_file():
+    if not images_dir.exists():
+        return assets
+
+    for path in sorted(images_dir.rglob("*")):
+        if path.is_file() and path.suffix.lower() in SUPPORTED_EXTENSIONS:
             assets.append(ImageAsset(local_path=path, file_stem=path.stem))
     return assets
 
