@@ -12,6 +12,7 @@ class AppConfig:
     output_images_manifest: Path
     max_keywords_per_pin: int = 8
     max_description_chars: int = 500
+    mockup_selection_seed: int | None = None
 
 
 DEFAULT_CONFIG = AppConfig(
