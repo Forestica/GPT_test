@@ -11,11 +11,20 @@ from pin_generator.services.text_generator import build_description, build_title
 
 
 def generate_pins(config: AppConfig, etsy_mapping_file: Path | None = None) -> tuple[list[PinRecord], list[Path]]:
+    print("[generate_pins] Starting pipeline...")
+    print(f"[generate_pins] input_images_dir: {config.input_images_dir.resolve()}")
+    print(f"[generate_pins] keyword_bank_path: {config.keyword_bank_path.resolve()}")
+    print(f"[generate_pins] output_csv_path: {config.output_csv_path.resolve()}")
+    print(f"[generate_pins] output_manifest_path: {config.output_images_manifest.resolve()}")
+    print(f"[generate_pins] etsy_mapping_file: {etsy_mapping_file.resolve() if etsy_mapping_file else '<none>'}")
+
     assets = discover_images(config.input_images_dir)
     keyword_bank = load_keyword_bank(config.keyword_bank_path)
+    print(f"[generate_pins] Loaded {len(keyword_bank)} keywords from bank.")
 
     records: list[PinRecord] = []
-    for asset in assets:
+    for idx, asset in enumerate(assets, start=1):
+        print(f"[generate_pins] Building record {idx}/{len(assets)} for file: {asset.local_path}")
         title = build_title(asset.file_stem)
         description = build_description(asset.file_stem)
         selected = select_keywords(
@@ -38,11 +47,16 @@ def generate_pins(config: AppConfig, etsy_mapping_file: Path | None = None) -> t
             )
         )
 
+    print(f"[generate_pins] Built {len(records)} records. Writing CSV batches...")
     generated_batches = save_pinterest_csv_batches(
         records=records,
         output_dir=config.output_csv_path.parent,
         batch_size=50,
         prefix=config.output_csv_path.stem,
     )
+    print(f"[generate_pins] CSV batches written: {len(generated_batches)}")
+
     save_upload_manifest(assets, config.media_base_url, config.output_images_manifest)
+    print("[generate_pins] Upload manifest written.")
+    print("[generate_pins] Pipeline finished.")
     return records, generated_batches
