@@ -11,8 +11,11 @@ def main() -> None:
     # Format: file_stem,etsy_url
     etsy_mapping_file = Path("data/input/etsy_links.csv")
 
-    records = generate_pins(config=config, etsy_mapping_file=etsy_mapping_file)
-    print(f"Generated {len(records)} pin records -> {config.output_csv_path}")
+    records, batch_paths = generate_pins(config=config, etsy_mapping_file=etsy_mapping_file)
+    print(f"Generated {len(records)} pin records")
+    print(f"Created {len(batch_paths)} Pinterest CSV batch file(s):")
+    for path in batch_paths:
+        print(f" - {path}")
     print(f"Upload helper manifest -> {config.output_images_manifest}")
 
 

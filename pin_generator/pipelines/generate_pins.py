@@ -4,13 +4,13 @@ from pathlib import Path
 
 from pin_generator.config import AppConfig
 from pin_generator.models import PinRecord
-from pin_generator.services.csv_exporter import save_pinterest_csv, save_upload_manifest
+from pin_generator.services.csv_exporter import save_pinterest_csv_batches, save_upload_manifest
 from pin_generator.services.image_discovery import discover_images, make_public_media_url
 from pin_generator.services.keyword_selector import load_keyword_bank, select_keywords
 from pin_generator.services.text_generator import build_description, build_title, detect_etsy_link
 
 
-def generate_pins(config: AppConfig, etsy_mapping_file: Path | None = None) -> list[PinRecord]:
+def generate_pins(config: AppConfig, etsy_mapping_file: Path | None = None) -> tuple[list[PinRecord], list[Path]]:
     assets = discover_images(config.input_images_dir)
     keyword_bank = load_keyword_bank(config.keyword_bank_path)
 
@@ -38,6 +38,11 @@ def generate_pins(config: AppConfig, etsy_mapping_file: Path | None = None) -> l
             )
         )
 
-    save_pinterest_csv(records, config.output_csv_path)
+    generated_batches = save_pinterest_csv_batches(
+        records=records,
+        output_dir=config.output_csv_path.parent,
+        batch_size=50,
+        prefix=config.output_csv_path.stem,
+    )
     save_upload_manifest(assets, config.media_base_url, config.output_images_manifest)
-    return records
+    return records, generated_batches
